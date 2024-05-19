@@ -1,15 +1,20 @@
-const express = require('express')
-const cors = require('cors')
-require('dotenv').config()
-const authRoutes = require('./routes/authRoutes')
-const app = express()
-const PORT = process.env.PORT || 6010
+const express = require('express');
+const bodyParser = require('body-parser');
+const authRoutes = require('./routes/authRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const dotenv = require('dotenv');
 
-app.use(cors())
-app.use(express.json())
+dotenv.config();
 
-app.use('/api/auth', authRoutes)
+const app = express();
+app.use(bodyParser.json());
 
+app.use('/', authRoutes);
+app.use('/teachers', teacherRoutes);
+app.use('/students', studentRoutes);
+
+const PORT = process.env.PORT || 6010;
 app.listen(PORT, () => {
-    console.log(`Server running in: ${PORT}`);
-})
+    console.log("🚀 ~ Server is Running on ~ PORT:", PORT)
+});
