@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const { addTeacher, findTeacherByEmail, getAllTeachers, updateTeacher } = require('../services/teacherService');
+const { addTeacher, findTeacherByEmail, getAllTeachers, updateTeacher, deleteTeacher} = require('../services/teacherService');
 const firebase = require('../config/firebase');
 
 exports.addTeacher = async (req, res) => {
@@ -27,15 +27,21 @@ exports.addTeacher = async (req, res) => {
             subject
         };
 
-        // Guarda el maestro en la colección "teachers" en Firebase
-        const teachersCollection = firebase.firestore().collection('teachers');
-        await teachersCollection.add(teacherData);
+        // Generar un ID único para el nuevo documento del maestro
+        const newTeacherRef = firebase.firestore().collection('teachers').doc();
 
-        res.status(201).json({ message: 'Teacher added successfully' });
+        // Establecer el ID generado en los datos del maestro
+        teacherData.id = newTeacherRef.id;
+
+        // Guardar el maestro en la colección "teachers" en Firebase
+        await newTeacherRef.set(teacherData);
+
+        res.status(201).json({ message: 'Teacher added successfully', teacherId: newTeacherRef.id });
     } catch (error) {
         res.status(500).json({ message: 'Error adding teacher', error: error.message });
     }
 };
+
 
 
 exports.getAllTeachers = async (req, res) => {
@@ -50,6 +56,14 @@ exports.getAllTeachers = async (req, res) => {
 exports.updateTeacher = async (req, res) => {
     try {
         const teacherId = req.params.id;
+        const teacherRef = firebase.firestore().collection('teachers').doc(teacherId);
+        const teacherDoc = await teacherRef.get();
+        
+        if (!teacherDoc.exists) {
+            return res.status(404).json({ message: 'Teacher not found' });
+        }
+
+        // Si el maestro existe, proceder con la actualización
         const teacherData = req.body;
         await updateTeacher(teacherId, teacherData);
         res.status(200).json({ message: 'Teacher updated successfully' });
@@ -57,6 +71,7 @@ exports.updateTeacher = async (req, res) => {
         res.status(500).json({ message: 'Error updating teacher', error: error.message });
     }
 };
+
 
 exports.deleteTeacher = async (req, res) => {
     try {

@@ -1,4 +1,5 @@
 const studentCollection = require('../models/studentModel');
+require('dotenv').config();
 
 exports.createStudent = async (studentData) => {
     try {
