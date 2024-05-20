@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const router = express.Router();
 const { addStudent, getAllStudents, updateStudent, deleteStudent } = require('../controllers/studentController');
 const { verifyToken } = require('../middleware/authMiddleware');
