@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const { createStudent, findStudentByEmail, getAllStudents, updateStudent, deleteStudent } = require('../services/studentService');
+const firebase = require('firebase-admin');
 
 exports.addStudent = async (req, res) => {
     try {
@@ -15,8 +16,30 @@ exports.addStudent = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Obtener el último ID generado
+        const idDocRef = firebase.firestore().collection('config').doc('studentId');
+        const idDoc = await idDocRef.get();
+        
+        let newId;
+        if (idDoc.exists) {
+            const lastId = idDoc.data().lastId;
+            newId = (parseInt(lastId, 16) + 1).toString(16); // Incrementar y convertir a hexadecimal
+        } else {
+            newId = '1'; // Iniciar con '1' en hexadecimal si no hay ningún ID previo
+        }
+
+        // Actualizar el último ID en la colección de configuración
+        await idDocRef.set({ lastId: newId });
+
         const newStudent = {
-            fullName, email, className, gender, password: hashedPassword, phoneNumber, id: `${Date.now()}-${email}`
+            id: newId,
+            fullName,
+            email,
+            className,
+            gender,
+            password: hashedPassword,
+            phoneNumber
         };
 
         const studentResult = await createStudent(newStudent);
