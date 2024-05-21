@@ -32,12 +32,18 @@ exports.addStudent = async (req, res) => {
 
 exports.getAllStudents = async (req, res) => {
     try {
-        const students = await getAllStudents();
-        res.status(200).json(students);
+        const students = await getAllStudents()
+        res.status(200).json({
+            message: 'Success',
+            students
+        })
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({
+            message: 'Server Error Getting All Students',
+            error: error.message
+        })
     }
-};
+}
 
 exports.updateStudent = async (req, res) => {
     try {

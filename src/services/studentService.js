@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const studentCollection = require('../models/studentModel');
 require('dotenv').config();
 

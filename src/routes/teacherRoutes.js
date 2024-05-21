@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const cors = require('cors');
 const { addTeacher, getAllTeachers, updateTeacher, deleteTeacher } = require('../controllers/teacherController');
-const { verifyToken } = require('../middleware/authMiddleware');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/addTeacher', verifyToken,  addTeacher);
-router.get('/getAllTeachers', verifyToken, getAllTeachers);
-router.put('/updateTeacher/:id', verifyToken, updateTeacher);
-router.delete('/deleteTeacher/:id', verifyToken, deleteTeacher);
+router.post('/addTeacher', authMiddleware, addTeacher);
+router.get('/getAllTeachers', authMiddleware, getAllTeachers);
+router.put('/updateTeacher/:id', authMiddleware, updateTeacher);
+router.delete('/deleteTeacher/:id', authMiddleware, deleteTeacher);
 
 module.exports = router;

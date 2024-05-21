@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const router = express.Router();
-const { addStudent, getAllStudents, updateStudent, deleteStudent } = require('../controllers/studentController');
-const { verifyToken } = require('../middleware/authMiddleware');
+const studentController = require('../controllers/studentController');
+const authMiddleware = require('../middleware/authMiddleware')
 
-router.post('/addStudent', verifyToken, addStudent);
-router.get('/getAllStudents', verifyToken, getAllStudents);
-router.put('/updateStudent/:id', verifyToken,  updateStudent);
-router.delete('/deleteStudent/:id', verifyToken,  deleteStudent);
+router.post('/addStudent', authMiddleware, studentController.addStudent);
+router.get('/getAllStudents', authMiddleware, studentController.getAllStudents);
+router.put('/updateStudent/:id', authMiddleware, studentController.updateStudent);
+router.delete('/deleteStudent/:id', authMiddleware, studentController.deleteStudent);
 
 module.exports = router;

@@ -1,29 +1,20 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const authRoutes = require('./routes/authRoutes');
+const express = require('express')
+const cors = require('cors')
+require('dotenv').config()
+const authRoutes = require('./routes/authRoutes')
+const app = express()
+const PORT = process.env.PORT || 6010
 const teacherRoutes = require('./routes/teacherRoutes');
 const studentRoutes = require('./routes/studentRoutes');
-const dotenv = require('dotenv');
-const cors = require('cors');
 
-dotenv.config();
-
-const app = express();
-
-// Configuración de CORS
-app.use(cors({
-    origin: 'http://localhost:3000', // Cambia esto a la URL de tu frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-
-app.use(bodyParser.json());
+app.use(cors())
+app.use(express.json())
 
 app.use('/', authRoutes);
 app.use('/teachers', teacherRoutes);
 app.use('/students', studentRoutes);
 
-const PORT = process.env.PORT || 6010;
+
 app.listen(PORT, () => {
     console.log("🚀 ~ Server is Running on ~ PORT:", PORT);
 });
