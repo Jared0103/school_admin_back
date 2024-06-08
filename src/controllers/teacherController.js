@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
-const { addTeacher, findTeacherByEmail, getAllTeachers, updateTeacher, deleteTeacher} = require('../services/teacherService');
+const { findTeacherByEmail, getAllTeachers, updateTeacher, deleteTeacher} = require('../services/teacherService');
 const firebase = require('../config/firebase');
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('json2csv');
 
 exports.addTeacher = async (req, res) => {
     try {
@@ -42,7 +45,50 @@ exports.addTeacher = async (req, res) => {
     }
 };
 
+exports.exportAllTeachersToCSV = async (req, res) => {
+    try {
+        const teachers = await getAllTeachers();
 
+        const csvData = [];
+        
+        // Iterar sobre cada profesor y agregar sus datos al arreglo csvData
+        teachers.forEach(teacher => {
+            csvData.push({
+                id: teacher.id,
+                fullName: teacher.fullName,
+                email: teacher.email,
+                className: teacher.className,
+                gender: teacher.gender,
+                phoneNumber: teacher.phoneNumber,
+                subject: teacher.subject
+            });
+        });
+
+        // Definir el nombre del archivo y la ruta donde se guardará
+        const fileName = 'teachers.csv';
+        const filePath = `./${fileName}`;
+
+        // Crear el archivo CSV y escribir la cabecera
+        fs.writeFileSync(filePath, '');
+        fs.appendFileSync(filePath, `${Object.keys(csvData[0]).join(',')}\n`);
+        
+        // Escribir los datos de los profesores en el archivo CSV
+        csvData.forEach(teacher => {
+            fs.appendFileSync(filePath, `${Object.values(teacher).join(',')}\n`);
+        });
+
+        // Configurar los encabezados de la respuesta para indicar al navegador que debe descargar el archivo
+        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+        res.setHeader('Content-Type', 'text/csv');
+
+        // Enviar el archivo CSV como respuesta
+        res.download(filePath, fileName);
+    } catch (error) {
+        // Si ocurre algún error, registrarlo y enviar una respuesta de error
+        console.error('Error al exportar profesores a CSV:', error);
+        res.status(500).json({ success: false, message: 'Error al exportar profesores a CSV' });
+    }
+};
 
 exports.getAllTeachers = async (req, res) => {
     try {
@@ -57,7 +103,7 @@ exports.getAllTeachers = async (req, res) => {
             error: error.message
         })
     }
-}
+};
 
 exports.updateTeacher = async (req, res) => {
     try {
